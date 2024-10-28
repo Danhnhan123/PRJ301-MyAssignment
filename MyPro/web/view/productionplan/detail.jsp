@@ -4,114 +4,74 @@
     Author     : Ad
 --%>
 
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Product Plan</title>
         <style>
-            .product-table {
-                display: none; /* Mặc định ẩn bảng sản phẩm */
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 5px;
+                text-align: center;
             }
         </style>
-        <script>
-            // Hàm để ẩn/hiện bảng sản phẩm khi nhấn vào shift
-            function toggleProductTable(shiftId) {
-                const productTable = document.getElementById(shiftId);
-                if (productTable.style.display === "none") {
-                    productTable.style.display = "table"; // Hiện bảng nếu đang ẩn
-                } else {
-                    productTable.style.display = "none"; // Ẩn bảng nếu đang hiện
-                }
-            }
-        </script>
     </head>
     <body>
         <form action="detail" method="POST">
-            <table border="1px">
+            <h2>Workshop: 
+                ${requestScope.plan.id}<input type="hidden" name="planId" value="${requestScope.plan.id}">
+                <input type="hidden" name="startDate" value="${requestScope.plan.startTime}">
+                <input type="hidden" name="endDate" value="${requestScope.plan.endTime}"></h2>
+            <table>
                 <tr>
-                    <th>Workshop</th>
-                    <th>Date</th>
-                    <th>Shift</th>
-                    <th>Product & Quantity</th>
-                    <th>Required Quantity</th>
+                    <th rowspan="3">Products</th>
+                    <th colspan="${fn:length(requestScope.dateList)*3}">Date</th>
                 </tr>
-                <c:forEach items="${requestScope.dateList}" var="date" varStatus="loop">
+
+                <tr>
+                    <c:forEach items="${requestScope.dateList}" var="date">
+                        <th colspan="3">${date}</th> <!-- Each date will have 3 sub-columns -->
+                        </c:forEach>
+                </tr>
+                <tr>
+                    <c:forEach items="${requestScope.dateList}" var="date">
+                        <td>K1</td>
+                        <td>K2</td>
+                        <td>K3</td>
+                    </c:forEach>
+                </tr>
+                <c:forEach items="${requestScope.plan.pc}" var="pr">
                     <tr>
-                        <td>${requestScope.plan.id}<input type="hidden" name="planId" value="${requestScope.plan.id}">
-                            <input type="hidden" name="startDate" value="${requestScope.plan.startTime}">
-                            <input type="hidden" name="endDate" value="${requestScope.plan.endTime}"></td>
-                        <td>${date}</td>
-
-                        <td>
-                            <table border="1px">
-                                <tr>
-                                    <!-- Khi nhấn vào shift, gọi hàm để ẩn/hiện bảng sản phẩm -->
-                                    <td><button type="button" onclick="toggleProductTable('product-table-${loop.index}_1')">K1</button></td>
-                                </tr>
-                                <tr>
-                                    <td><button type="button" onclick="toggleProductTable('product-table-${loop.index}_2')">K2</button></td>
-                                </tr>
-                                <tr>
-                                    <td><button type="button" onclick="toggleProductTable('product-table-${loop.index}_3')">K3</button></td>
-                                </tr>
-                            </table>
-                        </td>
-
-                        <td>
-                            <table id="product-table-${loop.index}_1" class="product-table" border="1px">
-                                <c:forEach items="${requestScope.products}" var="p">
-                                    <tr>
-                                        <td>${p.name}</td>
-                                        <td><input type="text" name="quantity${loop.index}_1" placeholder="Enter quantity" /></td>
-                                    </tr>
-                                </c:forEach>
-                            </table>
-
-                            <table id="product-table-${loop.index}_2" class="product-table" border="1px">
-                                <c:forEach items="${requestScope.products}" var="p">
-                                    <tr>
-                                        <td>${p.name}</td>
-                                        <td><input type="text" name="quantity${loop.index}_2" placeholder="Enter quantity" /></td>
-                                    </tr>
-                                </c:forEach>
-                            </table>
-
-                            <table id="product-table-${loop.index}_3" class="product-table" border="1px">
-                                <c:forEach items="${requestScope.products}" var="p">
-                                    <tr>
-                                        <td>${p.name}</td>
-                                        <td><input type="text" name="quantity${loop.index}_3" placeholder="Enter quantity" /></td>
-                                    </tr>
-                                </c:forEach>
-                            </table>
-
-                        </td>
-                        <c:if test="${loop.first}">
-                            <td rowspan="4" align="right">
-                                <table border="1px">
-                                    <c:forEach items="${requestScope.products}" var="pr">
-                                        <tr>
-                                            <td>${pr.name}</td>
-                                            <td>
-                                                <c:forEach items="${requestScope.plan.pc}" var="pl">
-                                                    <c:if test="${pl.p.id eq pr.id}">
-                                                        ${pl.quantity}
-                                                    </c:if>
-                                                </c:forEach>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                </table>
+                        <td>${pr.p.name}</td>
+                        <c:forEach items="${requestScope.dateList}" var="date" varStatus="loop">
+                            <td>
+                                <!-- Input for K1 -->
+                                <input type="number" name="quantity_${pr.p.id}_${date}_K1" placeholder="Quantity K1">
                             </td>
-                        </c:if>
+                            <td> 
+                                <!-- Input for K2 -->
+                                <input type="number" name="quantity_${pr.p.id}_${date}_K2" placeholder="Quantity K2">
+                            </td>
+                            <td>
+                                <!-- Input for K3 -->
+                                <input type="number" name="quantity_${pr.p.id}_${date}_K3" placeholder="Quantity K3">
+                            </td>
+                        </c:forEach>
                     </tr>
                 </c:forEach>
-
             </table>
-            <input type="submit" name="Save" value="Save Plan" />
+            <br>
+            <!-- Submit button -->
+            <input type="submit" value="Submit Quantities">
         </form>
     </body>
 </html>
+

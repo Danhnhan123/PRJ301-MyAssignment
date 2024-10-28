@@ -3,18 +3,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
-import java.sql.*;
+
+import java.util.ArrayList;
 
 /**
  *
  * @author Ad
  */
-public class Schedule {
+public class WokerSchedule {
     private int id;
-    private PlanCampaign cam;
-    private Date date;
-    private String k;
+    private Schedule sc;
+    private Employee e;
     private int quantity;
+    
 
     public int getId() {
         return id;
@@ -24,28 +25,20 @@ public class Schedule {
         this.id = id;
     }
 
-    public PlanCampaign getCam() {
-        return cam;
+    public Schedule getSc() {
+        return sc;
     }
 
-    public void setCam(PlanCampaign cam) {
-        this.cam = cam;
+    public void setSc(Schedule sc) {
+        this.sc = sc;
     }
 
-    public Date getDate() {
-        return date;
+    public Employee getE() {
+        return e;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public String getK() {
-        return k;
-    }
-
-    public void setK(String K) {
-        this.k = K;
+    public void setE(Employee e) {
+        this.e = e;
     }
 
     public int getQuantity() {
@@ -55,6 +48,7 @@ public class Schedule {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
     
     
 }

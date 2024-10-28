@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit this template
+-->
+<html>
+    <head>
+        <title>Home</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: Arial, sans-serif;
+            }
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                background-image: url("view/image/anh1.jpg"); /* Replace with your background image path */
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
+            .container {
+                background-color: rgba(255, 255, 255, 0.9);
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                text-align: center;
+                max-width: 500px;
+            }
+            h1 {
+                color: #333;
+                margin-bottom: 20px;
+            }
+            .nav-links a {
+                display: block;
+                padding: 12px 20px;
+                margin: 10px 0;
+                background-color: #ff6600;
+                color: white;
+                font-weight: bold;
+                text-decoration: none;
+                border-radius: 5px;
+                transition: background-color 0.3s;
+            }
+            .nav-links a:hover {
+                background-color: #e55a00;
+            }
+            /* Avatar Styles */
+            .avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: #ccc; /* Placeholder color for the avatar */
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                cursor: pointer;
+            }
+            /* Dropdown Styles */
+            .dropdown {
+                display: none; /* Hidden by default */
+                position: absolute;
+                top: 60px;
+                right: 10px;
+                background-color: white;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                z-index: 100;
+            }
+            .dropdown a {
+                display: block;
+                padding: 10px 15px;
+                color: black;
+                text-decoration: none;
+            }
+            .dropdown a:hover {
+                background-color: #f1f1f1;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Company Dashboard</h1>
+            <div class="nav-links">
+                <a href="productionplan/list">Production Plan</a>
+                <a href="work/list">Work Schedule</a>
+                <a href="Employee/salary">Employee</a>
+            </div>
+            <div class="avatar" onclick="toggleDropdown()"></div> <!-- Avatar for user -->
+            <div class="dropdown" id="dropdownMenu">
+                <a href="./view/Employee/Schedule.jsp">Schedule</a>
+                <a href="#">Information</a>
+                <a href="#">Salary</a>
+                <a href="#" onclick="confirmLogout()">Logout</a>
+            </div>
+        </div>
+        <script>
+            // Function to toggle dropdown visibility
+            function toggleDropdown() {
+                const dropdown = document.getElementById('dropdownMenu');
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            }
+
+            // Function to confirm logout
+            function confirmLogout() {
+                if (confirm("Do you really want to logout?")) {
+                    // Redirect to logout servlet or another page
+                    window.location.href = 'login'; // Ensure you have a servlet mapped to /logout
+                }
+            }
+
+            // Close dropdown if clicked outside
+            window.onclick = function (event) {
+                if (!event.target.matches('.avatar')) {
+                    const dropdown = document.getElementById('dropdownMenu');
+                    if (dropdown.style.display === 'block') {
+                        dropdown.style.display = 'none';
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>

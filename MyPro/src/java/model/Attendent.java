@@ -3,18 +3,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
-import java.sql.*;
 
 /**
  *
  * @author Ad
  */
-public class Schedule {
+public class Attendent {
     private int id;
-    private PlanCampaign cam;
-    private Date date;
-    private String k;
+    private WokerSchedule ws;
     private int quantity;
+    private float alpha;
 
     public int getId() {
         return id;
@@ -24,28 +22,12 @@ public class Schedule {
         this.id = id;
     }
 
-    public PlanCampaign getCam() {
-        return cam;
+    public WokerSchedule getWs() {
+        return ws;
     }
 
-    public void setCam(PlanCampaign cam) {
-        this.cam = cam;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public String getK() {
-        return k;
-    }
-
-    public void setK(String K) {
-        this.k = K;
+    public void setWs(WokerSchedule ws) {
+        this.ws = ws;
     }
 
     public int getQuantity() {
@@ -54,6 +36,14 @@ public class Schedule {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public float getAlpha() {
+        return alpha;
+    }
+
+    public void setAlpha(float alpha) {
+        this.alpha = alpha;
     }
     
     

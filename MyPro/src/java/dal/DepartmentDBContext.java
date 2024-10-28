@@ -65,7 +65,33 @@ public class DepartmentDBContext extends DBContext<Department> {
 
     @Override
     public ArrayList<Department> list() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        ArrayList<Department> depts = new ArrayList<>();
+        PreparedStatement stm = null;
+        String sql = "SELECT [did]\n"
+                + "      ,[dname]\n"
+                + "      ,[type]\n"
+                + "  FROM [Assignment].[dbo].[Dept]";
+        try {
+            stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Department d = new Department();
+                d.setId(rs.getInt("did"));
+                d.setName(rs.getString("dname"));
+                d.setType(rs.getString("type"));
+                depts.add(d);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DepartmentDBContext.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                stm.close();
+                connection.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DepartmentDBContext.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return depts;
     }
 
     @Override

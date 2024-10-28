@@ -4,6 +4,7 @@
  */
 package controller;
 
+import controller.accesscontrol.BaseRBACController;
 import dal.PlanDBContext;
 import dal.ProductDBContext;
 import dal.ScheduleDBContext;
@@ -19,22 +20,14 @@ import java.util.Calendar;
 import model.Plan;
 import model.PlanCampaign;
 import model.Schedule;
+import model.accesscontrol.User;
 
 /**
  *
  * @author Ad
  */
-public class ProductionPlanDetail extends HttpServlet {
+public class ProductionPlanDetail extends BaseRBACController {
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     public ArrayList<Date> getDateList(Date startDate, Date endDate) {
         ArrayList<Date> dateList = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
@@ -49,10 +42,10 @@ public class ProductionPlanDetail extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doAuthorizedGet(HttpServletRequest request, HttpServletResponse response, User loggeduser) throws ServletException, IOException {
         PlanDBContext db = new PlanDBContext();
         ProductDBContext dbp = new ProductDBContext();
+        ScheduleDBContext sdb = new ScheduleDBContext();
 
         Plan p = db.get(Integer.parseInt(request.getParameter("id")));
 
@@ -67,17 +60,8 @@ public class ProductionPlanDetail extends HttpServlet {
         }
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doAuthorizedPost(HttpServletRequest request, HttpServletResponse response, User loggeduser) throws ServletException, IOException {
         String planIdStr = request.getParameter("planId");
         if (planIdStr == null || planIdStr.trim().isEmpty()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing plan ID");
@@ -92,39 +76,53 @@ public class ProductionPlanDetail extends HttpServlet {
             return;
         }
 
-        // Lấy danh sách ngày (chúng ta đã có danh sách này trong requestScope khi gọi doGet)
+        // Retrieve the date list
         ArrayList<Date> dateList = getDateList(Date.valueOf(request.getParameter("startDate")),
                 Date.valueOf(request.getParameter("endDate")));
 
         PlanDBContext planDB = new PlanDBContext();
         Plan plan = planDB.get(planId);
 
+        if (plan == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Plan not found");
+            return;
+        }
 
-        // Lấy dữ liệu sản phẩm và số lượng từ form
         ScheduleDBContext scheduleDB = new ScheduleDBContext();
+        ArrayList<Schedule> schedulesToInsert = new ArrayList<>();  // Danh sách để lưu các Schedule cần chèn
 
-        for (int i = 0; i < dateList.size(); i++) {
-            Date currentDate = dateList.get(i);
+        // Loop through the PlanCampaign in the plan
+        for (PlanCampaign campaign : plan.getPc()) {
+            for (Date date : dateList) {
+                for (int shift = 1; shift <= 3; shift++) {
+                    String quantityParam = "quantity_" + campaign.getP().getId() + "_" + date + "_K" + shift;
+                    String quantityStr = request.getParameter(quantityParam);
 
-            for (int shift = 1; shift <= 3; shift++) {
-                String quantityParam = "quantity" + i + "_" + shift;
-
-                int quantity = Integer.parseInt(request.getParameter(quantityParam));
-
-                for (PlanCampaign campaign : plan.getPc()) {
-                    Schedule schedule = new Schedule();
-                    schedule.setCam(campaign);
-                    schedule.setDate(currentDate);
-                    schedule.setK("K" + shift);  
-                    schedule.setQuantity(quantity);
-
-                    scheduleDB.insert(schedule);
+                    if (quantityStr != null && !quantityStr.trim().isEmpty()) {
+                        int quantity = Integer.parseInt(quantityStr);
+                        if (quantity > 0) {
+                            Schedule schedule = new Schedule();
+                            schedule.setCam(campaign);
+                            schedule.setDate(date);
+                            schedule.setK("K" + shift);
+                            schedule.setQuantity(quantity);
+                            schedulesToInsert.add(schedule);  // Thêm schedule vào danh sách
+                        }
+                    }
                 }
             }
+        }
+
+        // Gọi phương thức insertSchedules với danh sách Schedule đã chuẩn bị
+        try {
+            scheduleDB.insertSchedules(schedulesToInsert);  // Chèn tất cả các schedule cùng lúc
+            response.sendRedirect("../productionplan/list");
+        } catch (Exception e) {
+            e.printStackTrace();
 
         }
-        response.sendRedirect("detail?id=" + planId);
     }
+
 }
 
 /**

@@ -88,17 +88,145 @@ public class PlanDBContext extends DBContext<Plan> {
 
     @Override
     public void update(Plan model) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try {
+            connection.setAutoCommit(false);
+
+            // Cập nhật bảng Plan
+            String sql_update_plan = "UPDATE [Plan] SET [startTime] = ?, [endTime] = ?, [did] = ? WHERE [plid] = ?";
+            PreparedStatement stm_update_plan = connection.prepareStatement(sql_update_plan);
+            stm_update_plan.setDate(1, model.getStartTime());
+            stm_update_plan.setDate(2, model.getEndTime());
+            stm_update_plan.setInt(3, model.getD().getId());
+            stm_update_plan.setInt(4, model.getId());
+            stm_update_plan.executeUpdate();
+
+            // Xóa các PlanCampaign cũ liên quan đến Plan
+            String sql_delete_campaigns = "DELETE FROM [PlanCampaign] WHERE [plid] = ?";
+            PreparedStatement stm_delete_campaigns = connection.prepareStatement(sql_delete_campaigns);
+            stm_delete_campaigns.setInt(1, model.getId());
+            stm_delete_campaigns.executeUpdate();
+
+            // Thêm các PlanCampaign mới
+            String sql_insert_campaign = "INSERT INTO [PlanCampaign] ([plid], [pid], [quantity], [unitEffort]) VALUES (?, ?, ?, ?)";
+            PreparedStatement stm_insert_campaign = connection.prepareStatement(sql_insert_campaign);
+            for (PlanCampaign campaign : model.getPc()) {
+                stm_insert_campaign.setInt(1, model.getId());
+                stm_insert_campaign.setInt(2, campaign.getP().getId());
+                stm_insert_campaign.setInt(3, campaign.getQuantity());
+                stm_insert_campaign.setFloat(4, campaign.getEffort());
+                stm_insert_campaign.executeUpdate();
+            }
+
+            connection.commit();
+        } catch (SQLException ex) {
+            Logger.getLogger(PlanDBContext.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                connection.rollback();
+            } catch (SQLException ex1) {
+                Logger.getLogger(PlanDBContext.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException ex) {
+                Logger.getLogger(PlanDBContext.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                connection.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(PlanDBContext.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     @Override
     public void delete(Plan model) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql_update = "DELETE FROM [dbo].[Plan]\n"
+                + "      WHERE plid=?";
+
+        PreparedStatement stm_update = null;
+        try {
+            stm_update = connection.prepareStatement(sql_update);
+            stm_update.setInt(1, model.getId());
+            stm_update.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(PlanDBContext.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(PlanDBContext.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     @Override
     public ArrayList<Plan> list() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        ArrayList<Plan> plans = new ArrayList<>();
+        PreparedStatement stm = null;
+        String sql = "SELECT p.[plid], p.[startTime], p.[endTime], p.[did], pl.[pid], pl.[quantity], pl.[unitEffort], pl.[camid], pr.[pname] "
+                + "FROM [Plan] p "
+                + "LEFT JOIN [PlanCampaign] pl ON p.plid = pl.plid "
+                + "LEFT JOIN [Product] pr ON pl.pid = pr.pid";
+
+        try {
+            stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            Plan currentPlan = null;
+            int currentPlanId = -1;
+
+            while (rs.next()) {
+                int planId = rs.getInt("plid");
+
+                // Nếu planId thay đổi, tạo đối tượng Plan mới
+                if (planId != currentPlanId) {
+                    currentPlan = new Plan();
+                    currentPlan.setId(planId);
+                    currentPlan.setStartTime(rs.getDate("startTime"));
+                    currentPlan.setEndTime(rs.getDate("endTime"));
+
+                    Department dept = new Department();
+                    dept.setId(rs.getInt("did"));
+                    currentPlan.setD(dept);
+
+                    currentPlan.setPc(new ArrayList<>());  // Khởi tạo danh sách PlanCampaign
+
+                    plans.add(currentPlan);  // Thêm Plan vào danh sách
+                    currentPlanId = planId;
+                }
+
+                // Xử lý dữ liệu của PlanCampaign nếu có
+                if (rs.getInt("camid") != 0) { // Kiểm tra có PlanCampaign hay không
+                    PlanCampaign campaign = new PlanCampaign();
+
+                    Product product = new Product();
+                    product.setId(rs.getInt("pid"));
+                    product.setName(rs.getString("pname"));
+
+                    campaign.setId(rs.getInt("camid"));
+                    campaign.setPl(currentPlan);
+                    campaign.setP(product);
+                    campaign.setQuantity(rs.getInt("quantity"));
+                    campaign.setEffort(rs.getFloat("unitEffort"));
+
+                    currentPlan.getPc().add(campaign);  // Thêm PlanCampaign vào Plan
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(PlanDBContext.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                if (stm != null) {
+                    stm.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(PlanDBContext.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return plans;
     }
 
     @Override
@@ -116,35 +244,45 @@ public class PlanDBContext extends DBContext<Plan> {
             stm = connection.prepareStatement(sql);
             stm.setInt(1, id);
             ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                Plan p = new Plan();
-                p.setId(rs.getInt("plid"));
-                p.setStartTime(rs.getDate("startTime"));
-                p.setEndTime(rs.getDate("endTime"));
 
-                Department d = new Department();
-                d.setId(rs.getInt("did"));
-                p.setD(d);
-                p.setPc(new ArrayList<>());
+            Plan p = null;  // Khởi tạo Plan là null trước
+            while (rs.next()) {
+                if (p == null) {
+                    // Khởi tạo Plan khi có kết quả đầu tiên từ ResultSet
+                    p = new Plan();
+                    p.setId(rs.getInt("plid"));
+                    p.setStartTime(rs.getDate("startTime"));
+                    p.setEndTime(rs.getDate("endTime"));
 
-                for (PlanCampaign campaign : p.getPc()) {
-                    Product pr = new Product();
-                    pr.setId(rs.getInt("pr.pid"));
-                    pr.setName(rs.getString("pr.pname"));
-                    
-                    
-                    campaign.setId(rs.getInt("camid"));
-                    campaign.setPl(p);
-                    campaign.setP(pr);
-                    campaign.setQuantity(rs.getInt("c.quantity"));
-                    campaign.setEffort(rs.getInt("c.unitEffort"));
-                    p.getPc().add(campaign);
+                    Department d = new Department();
+                    d.setId(rs.getInt("did"));
+                    p.setD(d);
+
+                    // Khởi tạo danh sách PlanCampaign rỗng
+                    p.setPc(new ArrayList<>());
                 }
-                return p;
+
+                // Tạo mới PlanCampaign cho từng dòng kết quả
+                PlanCampaign campaign = new PlanCampaign();
+
+                Product pr = new Product();
+                pr.setId(rs.getInt("pid"));
+                pr.setName(rs.getString("pname"));
+
+                campaign.setId(rs.getInt("camid"));
+                campaign.setPl(p);
+                campaign.setP(pr);
+                campaign.setQuantity(rs.getInt("quantity"));
+                campaign.setEffort(rs.getFloat("unitEffort"));
+
+                // Thêm PlanCampaign vào danh sách
+                p.getPc().add(campaign);
             }
+
+            return p;
         } catch (SQLException ex) {
             Logger.getLogger(PlanDBContext.class.getName()).log(Level.SEVERE, null, ex);
-        } finally{
+        } finally {
             try {
                 connection.close();
             } catch (SQLException ex) {
