@@ -4,6 +4,7 @@
     Author     : Ad
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.Calendar"%>
 <%@page import="java.sql.Date"%>
@@ -37,10 +38,11 @@
 
         <form method="POST" action="schedule">
             <label for="year">Year:</label>
+            <!-- code year, month get from chatGPT -->
             <select id="year" name="year">
                 <%
                     int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-                    for (int i = currentYear - 10; i <= currentYear + 10; i++) {
+                    for (int i = currentYear - 24; i <= currentYear + 10; i++) {
                 %>
                 <option value="<%=i%>" <%= (i == currentYear) ? "selected" : "" %>><%=i%></option>
                 <%
@@ -90,20 +92,50 @@
                     out.print("<td></td>");
                 }
 
-                // Print each day of the month
-                for (int day = 1; day <= daysInMonth; day++) {
-                    out.print("<td><a href='#'>" + day + "</a></td>");
-
-                    // Start a new row after Saturday
-                    if ((day + firstDayOfWeek - 1) % 7 == 0) {
-                        out.print("</tr><tr>");
-                    }
+                 for (int day = 1; day <= daysInMonth; day++) {
+                    out.print("<td><a href='schedule?date=" + new Date(calendar.getTimeInMillis()) + "'>" + day + "</a></td>");
+                    if ((day + firstDayOfWeek - 1) % 7 == 0) { out.print("</tr><tr>"); }
+                    calendar.add(Calendar.DATE, 1);
                 }
 
                 // Close the table
                 out.print("</tr></table>");
             }
         %>
+
+        <c:if test="${not empty param.date}">
+
+            <h2>Employee :</h2>
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <th>Shift</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                </tr>
+
+                <c:forEach items="${requestScope.schedules}" var="sche">
+                        <c:if test="${param.date eq sche.date}">
+                            <tr>
+                                <td>${sche.date}</td>
+                                <td>${sche.k}</td>
+                                <c:forEach items="${requestScope.plans}" var="pl">
+                                    <c:forEach items="${pl.pc}" var="pc">
+                                        <c:if test="${pc.id==sche.cam.id}">
+                                            <td>${pc.p.name}</td>
+                                        </c:if>
+                                    </c:forEach>
+                                </c:forEach>
+
+                                    <td></td>
+
+                            </tr>
+                        </c:if>                      
+                </c:forEach>
+
+            </table>
+
+        </c:if>
     </body>
 </html>
 

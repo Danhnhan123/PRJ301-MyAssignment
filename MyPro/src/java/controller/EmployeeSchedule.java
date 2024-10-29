@@ -4,6 +4,12 @@
  */
 package controller;
 
+import dal.AttendentDBContext;
+import dal.EmployeeDBContext;
+import dal.PlanDBContext;
+import dal.ProductDBContext;
+import dal.ScheduleDBContext;
+import dal.WokerScheduleDBContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -45,7 +51,17 @@ public class EmployeeSchedule extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        ScheduleDBContext db = new ScheduleDBContext();
+        EmployeeDBContext emps = new EmployeeDBContext();
+        ProductDBContext pr = new ProductDBContext();
+        WokerScheduleDBContext ws = new WokerScheduleDBContext();
+        AttendentDBContext attends = new AttendentDBContext();
+        PlanDBContext pdb = new PlanDBContext();
+        request.setAttribute("plans", pdb.list());
+        request.setAttribute("attends", attends.list());
+        request.setAttribute("workList", ws.list());
+        request.setAttribute("emps", emps.list());
+        request.setAttribute("schedules", db.list());
         request.getRequestDispatcher("../view/Employee/Schedule.jsp").forward(request, response);
     }
 
