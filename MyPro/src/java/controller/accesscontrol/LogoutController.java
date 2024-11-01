@@ -26,9 +26,16 @@ public class LogoutController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.getSession().setAttribute("account", null);
+        response.sendRedirect("index.html");
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        processRequest(request, response);
     }
 
     /**
@@ -42,9 +49,7 @@ public class LogoutController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getSession().invalidate();
-        // Redirect to the login page
-        response.sendRedirect("index.html"); // Adjust to your login page
+        processRequest(request, response);
     }
 
 }
