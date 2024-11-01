@@ -23,6 +23,7 @@
                     </option>
                 </c:forEach>
             </select><br/>
+            ${requestScope.error}
             <table border = "1px">
                 <tr>
                 <th>Product</th>

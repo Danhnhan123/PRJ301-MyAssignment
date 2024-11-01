@@ -28,7 +28,6 @@ import model.accesscontrol.User;
  */
 public class ProductionPlanCreate extends BaseRBACController {
 
-    
     @Override
     protected void doAuthorizedGet(HttpServletRequest request, HttpServletResponse response, User loggeduser) throws ServletException, IOException {
         ProductDBContext db = new ProductDBContext();
@@ -76,8 +75,13 @@ public class ProductionPlanCreate extends BaseRBACController {
             db.insert(plan);
             response.sendRedirect("../productionplan/list");
         } else {
+            ProductDBContext db = new ProductDBContext();
+            DepartmentDBContext dbd = new DepartmentDBContext();
+
+            request.setAttribute("products", db.list());
+            request.setAttribute("depts", dbd.get("workshop"));
             request.setAttribute("error", error1);
-            request.getRequestDispatcher("../view/productionplan/list.jsp").forward(request, response);
+            request.getRequestDispatcher("../view/productionplan/create.jsp").forward(request, response);
         }
     }
 
