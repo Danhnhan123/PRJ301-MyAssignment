@@ -257,7 +257,7 @@
                         </tr>
                         <c:forEach var="wl" items="${requestScope.workList}">
                             <c:forEach items="${requestScope.attends}" var="at">
-                                <c:if test="${at.ws.id==wl.id && wl.sc.id==requestScope.schedule.id}">
+                                <c:if test="${at.ws.id==wl.id && wl.id==param.wsid}">
                                     <tr>
                                         <c:forEach items="${requestScope.emps}" var="emp">
                                             <c:if test="${wl.e.id==emp.id}">
@@ -289,6 +289,7 @@
                 </div>
                 <form action="attendent" method="GET">
                     <input type="hidden" name="scheId1" value="${param.scheId}" />
+                    <input type="hidden" name="wsid" value="${param.wsid}">
                     <input type="submit" class="button" value="Add new work in day"/>
                 </form>
             </c:if>

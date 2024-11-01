@@ -49,7 +49,7 @@
                     <th>Alpha</th>
                 </tr>
                 <c:forEach var="wl" items="${requestScope.workList}">
-                    <c:if test="${wl.sc.id==requestScope.schedule.id}">
+                    <c:if test="${wl.id==param.wsid}">
                         <input type="hidden" name="scid" value="${wl.id}"/>
                         <tr>
                             <c:forEach items="${requestScope.emps}" var="emp">

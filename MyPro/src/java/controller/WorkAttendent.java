@@ -48,18 +48,16 @@ public class WorkAttendent extends BaseRBACController {
 
     @Override
     protected void doAuthorizedPost(HttpServletRequest request, HttpServletResponse response, User loggeduser) throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("scheId"));
+        int id = Integer.parseInt(request.getParameter("scid"));
         ArrayList<Attendent> attend = new ArrayList<>();
         WokerScheduleDBContext ws = new WokerScheduleDBContext();
 
         for (WokerSchedule worker : ws.list()) {
-            if (worker.getSc().getId() == id) {
+            if (worker.getId() == id) {
                 Attendent at = new Attendent();
                 if (request.getParameter("actualQuantity") != null && !request.getParameter("actualQuantity").isEmpty()) {
                     at.setQuantity(Integer.parseInt(request.getParameter("actualQuantity")));
-                    WokerSchedule sche = new WokerSchedule();
-                    sche.setId(Integer.parseInt(request.getParameter("scid")));
-                    at.setWs(sche);
+                    at.setWs(worker);
                     at.setAlpha(Float.parseFloat(request.getParameter("alpha2")));
                     attend.add(at);
                 }

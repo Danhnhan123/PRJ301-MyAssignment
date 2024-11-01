@@ -68,10 +68,6 @@
         <servlet-name>LogoutController</servlet-name>
         <servlet-class>controller.accesscontrol.LogoutController</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>EmployeeSchedule</servlet-name>
-        <servlet-class>controller.EmployeeSchedule</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>ProductionPlanCreate</servlet-name>
         <url-pattern>/productionplan/create</url-pattern>
@@ -139,9 +135,5 @@
     <servlet-mapping>
         <servlet-name>LogoutController</servlet-name>
         <url-pattern>/logout</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>EmployeeSchedule</servlet-name>
-        <url-pattern>/Employee/schedule</url-pattern>
     </servlet-mapping>
 </web-app>
