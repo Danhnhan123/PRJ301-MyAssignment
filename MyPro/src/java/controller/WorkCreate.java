@@ -61,7 +61,7 @@ public class WorkCreate extends BaseRBACController {
         String[] quantities = request.getParameterValues("quantity");
 
         for (int i = 0; i < workerIds.length; i++) {
-            if (quantities[i] == null || quantities[i].trim().isEmpty()) {
+            if (quantities[i] == null || quantities[i].trim().isEmpty() || Integer.parseInt(quantities[i])==0) {
                 // Bỏ qua nếu quantity rỗng
                 continue;
             }

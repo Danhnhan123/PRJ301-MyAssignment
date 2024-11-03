@@ -53,7 +53,7 @@ public class WorkUpdate extends BaseRBACController {
         Schedule sc = new Schedule();
         sc.setId(Integer.parseInt(request.getParameter("scheId")));
         ws.setSc(sc);
-        if (request.getParameter("quantity") != null && !request.getParameter("quantity").isEmpty()) {
+        if (request.getParameter("quantity") != null && !request.getParameter("quantity").isEmpty() && Integer.parseInt(request.getParameter("quantity"))!=0) {
             ws.setQuantity(Integer.parseInt(request.getParameter("quantity")));
             WokerScheduleDBContext db = new WokerScheduleDBContext();
             db.update(ws);
