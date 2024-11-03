@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Plan;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import model.Department;
 import model.PlanCampaign;
@@ -53,16 +54,25 @@ public class ProductionPlanUpdate extends BaseRBACController {
         String[] pids = request.getParameterValues("prid");
         //read parameters
         String raw_id = request.getParameter("planId");
-        String raw_start = request.getParameter("startTime");
-        String raw_end = request.getParameter("endTime");
+        Date raw_start = Date.valueOf(request.getParameter("startTime"));
+        Date raw_end = Date.valueOf(request.getParameter("endTime"));
+        if (raw_start.after(raw_end)) {
+            // Set error attribute and return to JSP if 'from' is greater than 'to'
+            request.setAttribute("error1", "'From' date cannot be after 'To' date. Please enter valid dates.");
+
+            loadFormData(request, Integer.parseInt(raw_id));
+
+            request.getRequestDispatcher("../view/productionplan/update.jsp").forward(request, response);
+            return;
+        }
         String raw_did = request.getParameter("did");
 
         //validate parameters (do it your self)
         //object binding
         Plan p = new Plan();
         p.setId(Integer.parseInt(raw_id));
-        p.setStartTime(Date.valueOf(raw_start));
-        p.setEndTime(Date.valueOf(raw_end));
+        p.setStartTime(raw_start);
+        p.setEndTime(raw_end);
 
         Department d = new Department();
         d.setId(Integer.parseInt(raw_did));
@@ -70,28 +80,53 @@ public class ProductionPlanUpdate extends BaseRBACController {
         p.setD(d);
 
         p.setPc(new ArrayList<>());
-
+        StringBuilder errorBuilder = new StringBuilder();
         for (String pid : pids) {
             Product pr = new Product();
             pr.setId(Integer.parseInt(pid));
             PlanCampaign pc = new PlanCampaign();
             pc.setP(pr);
-            String raw_quantity = request.getParameter("quantity" + pid);
-            String raw_effort = request.getParameter("effort" + pid);
+            try {
+                String raw_quantity = request.getParameter("quantity" + pid);
+                String raw_effort = request.getParameter("effort" + pid);
 
-            pc.setQuantity(raw_quantity != null && raw_quantity.length() > 0 ? Integer.parseInt(raw_quantity) : 0);
-            pc.setEffort(raw_effort != null && raw_effort.length() > 0 ? Float.parseFloat(raw_effort) : 0);
-            pc.setPl(p);
-            if (pc.getQuantity() != 0 && pc.getEffort() != 0) {
-                p.getPc().add(pc);
+                // Parse values and set them to PlanCampaign
+                int quantity = raw_quantity != null && raw_quantity.length() > 0 ? Integer.parseInt(raw_quantity) : 0;
+                float effort = raw_effort != null && raw_effort.length() > 0 ? Float.parseFloat(raw_effort) : 0;
+
+                pc.setQuantity(quantity);
+                pc.setEffort(effort);
+                pc.setPl(p);
+
+                if (quantity != 0 && effort != 0) {
+                    p.getPc().add(pc);
+                }
+            } catch (NumberFormatException e) {
+                // If parsing fails, append an error message
+                errorBuilder.append("Invalid input for quantity or effort!");
             }
 
         }
-
+        if (errorBuilder.length() > 0) {
+            loadFormData(request, Integer.parseInt(raw_id)); // Load products and departments for display
+            request.setAttribute("error1", errorBuilder.toString());
+            request.getRequestDispatcher("../view/productionplan/update.jsp").forward(request, response);
+            return;
+        }
         PlanDBContext db = new PlanDBContext();
         db.update(p);
 
         response.sendRedirect("list");
     }
 
+    private void loadFormData(HttpServletRequest request, int id) {
+        PlanDBContext db = new PlanDBContext();
+        DepartmentDBContext d = new DepartmentDBContext();
+        ProductDBContext pr = new ProductDBContext();
+        Plan p = db.get(id);
+        request.setAttribute("products", pr.list());
+        request.setAttribute("depts", d.list());
+        request.setAttribute("plan", p);
+        request.setAttribute("planCampaign", p.getPc());
+    }
 }

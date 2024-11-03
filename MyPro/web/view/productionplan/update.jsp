@@ -25,6 +25,7 @@
     </head>
     <body>
         <form action="update" method="POST">
+            ${requestScope.error1}
             <table>
                 <tr>
                     <th>Plan Id</th>
