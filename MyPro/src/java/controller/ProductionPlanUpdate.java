@@ -18,10 +18,13 @@ import model.Plan;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Department;
 import model.PlanCampaign;
 import model.Product;
 import model.accesscontrol.User;
+import org.eclipse.jdt.core.compiler.InvalidInputException;
 
 /**
  *
@@ -94,6 +97,10 @@ public class ProductionPlanUpdate extends BaseRBACController {
                 int quantity = raw_quantity != null && raw_quantity.length() > 0 ? Integer.parseInt(raw_quantity) : 0;
                 float effort = raw_effort != null && raw_effort.length() > 0 ? Float.parseFloat(raw_effort) : 0;
 
+                if (quantity < 0 || effort < 0) {
+                    throw new InvalidInputException("Quantity and Effort cannot be less than 0!");
+                }
+
                 pc.setQuantity(quantity);
                 pc.setEffort(effort);
                 pc.setPl(p);
@@ -104,6 +111,8 @@ public class ProductionPlanUpdate extends BaseRBACController {
             } catch (NumberFormatException e) {
                 // If parsing fails, append an error message
                 errorBuilder.append("Invalid input for quantity or effort!");
+            } catch (InvalidInputException ex) {
+                errorBuilder.append(ex.getMessage()).append(" ");
             }
 
         }
