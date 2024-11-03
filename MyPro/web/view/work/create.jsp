@@ -26,7 +26,7 @@
     <body>
         <form action="create" method="POST">
             <h2>Worker Schedule: ${requestScope.schedule.id}<input type="hidden" name="scheId" value="${requestScope.schedule.id}"/></h2><br/>
-            
+            ${requestScope.error}
             <table>
                 <tr>
                     <th>Worker Id</th>

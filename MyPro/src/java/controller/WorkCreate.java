@@ -17,11 +17,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Employee;
 import model.Product;
 import model.Schedule;
 import model.WokerSchedule;
 import model.accesscontrol.User;
+import org.eclipse.jdt.core.compiler.InvalidInputException;
 
 /**
  *
@@ -56,18 +59,21 @@ public class WorkCreate extends BaseRBACController {
         ArrayList<WokerSchedule> ws = new ArrayList<>();
         EmployeeDBContext emp = new EmployeeDBContext();
         ArrayList<Employee> emps = emp.list();
+        StringBuilder errorBuilder = new StringBuilder();
 
         String[] workerIds = request.getParameterValues("workerId");
         String[] quantities = request.getParameterValues("quantity");
 
         for (int i = 0; i < workerIds.length; i++) {
-            if (quantities[i] == null || quantities[i].trim().isEmpty() || Integer.parseInt(quantities[i])==0) {
+            if (quantities[i] == null || quantities[i].trim().isEmpty() || Integer.parseInt(quantities[i]) == 0) {
                 // Bỏ qua nếu quantity rỗng
                 continue;
             }
             try {
                 int quantity = Integer.parseInt(quantities[i]);
-
+                if (quantity < 0) {
+                    throw new InvalidInputException("Quantity cannot be less than 0!");
+                }
                 // Khởi tạo đối tượng WorkerSchedule mới cho từng worker
                 WokerSchedule workerSchedule = new WokerSchedule();
 
@@ -91,9 +97,17 @@ public class WorkCreate extends BaseRBACController {
             } catch (NumberFormatException e) {
                 // Nếu quantity không phải là số hợp lệ thì bỏ qua
                 continue;
+            } catch (InvalidInputException ex) {
+                errorBuilder.append("Invalid input for quantity!");
             }
-        }
 
+        }
+        if (errorBuilder.length() > 0) {
+            loadFormData(request,scheId); // Load products and departments for display
+            request.setAttribute("error", errorBuilder.toString());
+            request.getRequestDispatcher("../view/work/create.jsp").forward(request, response);
+            return;
+        }
         try {
             db.insertWorker(ws);  // Chèn tất cả các schedule cùng lúc
             response.sendRedirect("../work/list");
@@ -103,4 +117,19 @@ public class WorkCreate extends BaseRBACController {
         }
     }
 
+    private void loadFormData(HttpServletRequest request,int id) {
+        ScheduleDBContext ScheduleDB = new ScheduleDBContext();
+        EmployeeDBContext emp = new EmployeeDBContext();
+        ProductDBContext db = new ProductDBContext();
+        DepartmentDBContext dbd = new DepartmentDBContext();
+
+        Schedule sche = ScheduleDB.get(id);
+        ArrayList<Employee> employees = emp.list();
+        ArrayList<Product> products = db.list();
+
+        request.setAttribute("depts", dbd.get("workshop"));
+        request.setAttribute("employees", employees);
+        request.setAttribute("schedule", sche);
+        request.setAttribute("products", products);
+    }
 }

@@ -30,7 +30,7 @@
                 <input type="hidden" name="wsId" value="${requestScope.work.id}"/>
                 <input type="hidden" name="scheId" value="${requestScope.schedule.id}"/>
             </h2><br/>
-
+            ${requestScope.error}
             <table>
                 <tr>
                     <th>Worker Id</th>
