@@ -97,7 +97,9 @@ public class UserDBContext extends DBContext<User> {
             Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                stm.close();
+                if(stm!=null){
+                    stm.close();
+                }
                 connection.close();
             } catch (SQLException ex) {
                 Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, null, ex);

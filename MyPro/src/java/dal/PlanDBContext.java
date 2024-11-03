@@ -101,14 +101,14 @@ public class PlanDBContext extends DBContext<Plan> {
             stm_update_plan.executeUpdate();
 
             // Thêm các PlanCampaign mới
-            String sql_insert_campaign = "UPDATE [PlanCampaign] SET [plid] = ?, [pid] = ?, [quantity] = ?, [unitEffort] = ? WHERE[plid] = ?";
+            String sql_insert_campaign = "UPDATE [PlanCampaign] SET [plid] = ?, [pid] = ?, [quantity] = ?, [unitEffort] = ? WHERE[camid] = ?";
             PreparedStatement stm_insert_campaign = connection.prepareStatement(sql_insert_campaign);
             for (PlanCampaign campaign : model.getPc()) {
                 stm_insert_campaign.setInt(1, model.getId());
                 stm_insert_campaign.setInt(2, campaign.getP().getId());
                 stm_insert_campaign.setInt(3, campaign.getQuantity());
                 stm_insert_campaign.setFloat(4, campaign.getEffort());
-                stm_insert_campaign.setInt(5, model.getId());
+                stm_insert_campaign.setInt(5, campaign.getId());
                 stm_insert_campaign.executeUpdate();
             }
 

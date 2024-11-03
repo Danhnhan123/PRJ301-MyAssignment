@@ -102,9 +102,11 @@
                             </thead>
                             <tbody>
                                 <c:forEach items="${requestScope.planCampaign}" var="pc">
+                                
                                     <tr>
                                         <c:forEach items="${requestScope.products}" var="pr">
                                             <c:if test="${pc.p.id == pr.id}">
+                                                <input type="hidden" name="camid${pr.id}" value="${pc.id}"/>
                                                 <td>
                                                     <input type="hidden" name="prid" value="${pr.id}"/>${pr.name}
                                                 </td>

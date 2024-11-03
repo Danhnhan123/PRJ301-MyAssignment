@@ -89,6 +89,7 @@ public class ProductionPlanUpdate extends BaseRBACController {
             pr.setId(Integer.parseInt(pid));
             PlanCampaign pc = new PlanCampaign();
             pc.setP(pr);
+            pc.setId(Integer.parseInt(request.getParameter("camid"+pid)));
             try {
                 String raw_quantity = request.getParameter("quantity" + pid);
                 String raw_effort = request.getParameter("effort" + pid);
@@ -124,7 +125,6 @@ public class ProductionPlanUpdate extends BaseRBACController {
         }
         PlanDBContext db = new PlanDBContext();
         db.update(p);
-
         response.sendRedirect("list");
     }
 

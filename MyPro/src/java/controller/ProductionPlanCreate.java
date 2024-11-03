@@ -50,7 +50,7 @@ public class ProductionPlanCreate extends BaseRBACController {
         if (request.getParameter("from") != null && !request.getParameter("from").isEmpty() && request.getParameter("to") != null && !request.getParameter("to").isEmpty()) {
             Date startTime = Date.valueOf(request.getParameter("from"));
             Date endTime = Date.valueOf(request.getParameter("to"));
-
+            StringBuilder errorBuilder = new StringBuilder();
             // Check if 'from' date is greater than 'to' date
             if (startTime.after(endTime)) {
                 // Set error attribute and return to JSP if 'from' is greater than 'to'
@@ -60,44 +60,46 @@ public class ProductionPlanCreate extends BaseRBACController {
 
                 request.getRequestDispatcher("../view/productionplan/create.jsp").forward(request, response);
                 return;
-            }
+            } else {
+                plan.setStartTime(startTime);
+                plan.setEndTime(endTime);
+                Department d = new Department();
+                d.setId(Integer.parseInt(request.getParameter("did")));
+                plan.setD(d);
 
-            Department d = new Department();
-            d.setId(Integer.parseInt(request.getParameter("did")));
-            plan.setD(d);
+                plan.setPc(new ArrayList<>());
 
-            plan.setPc(new ArrayList<>());
-            StringBuilder errorBuilder = new StringBuilder();
-            for (String pid : pids) {
-                Product p = new Product();
-                p.setId(Integer.parseInt(pid));
-                PlanCampaign pg = new PlanCampaign();
-                pg.setP(p);
+                for (String pid : pids) {
+                    Product p = new Product();
+                    p.setId(Integer.parseInt(pid));
+                    PlanCampaign pg = new PlanCampaign();
+                    pg.setP(p);
 
-                try {
-                    String raw_quantity = request.getParameter("quantity" + pid);
-                    String raw_effort = request.getParameter("effort" + pid);
+                    try {
+                        String raw_quantity = request.getParameter("quantity" + pid);
+                        String raw_effort = request.getParameter("effort" + pid);
 
-                    // Parse values and set them to PlanCampaign
-                    int quantity = raw_quantity != null && raw_quantity.length() > 0 ? Integer.parseInt(raw_quantity) : 0;
-                    float effort = raw_effort != null && raw_effort.length() > 0 ? Float.parseFloat(raw_effort) : 0;
+                        // Parse values and set them to PlanCampaign
+                        int quantity = raw_quantity != null && raw_quantity.length() > 0 ? Integer.parseInt(raw_quantity) : 0;
+                        float effort = raw_effort != null && raw_effort.length() > 0 ? Float.parseFloat(raw_effort) : 0;
 
-                    if (quantity < 0 || effort < 0) {
-                        throw new InvalidInputException("Quantity and Effort cannot be less than 0!");
+                        if (quantity < 0 || effort < 0) {
+                            throw new InvalidInputException("Quantity and Effort cannot be less than 0!");
+                        }
+
+                        pg.setQuantity(quantity);
+                        pg.setEffort(effort);
+                        pg.setPl(plan);
+
+                        if (quantity != 0 || effort != 0) {
+                            plan.getPc().add(pg);
+                        }
+                    } catch (NumberFormatException e) {
+                        // If parsing fails, append an error message
+                        errorBuilder.append("Invalid input for quantity or effort!");
+                    } catch (InvalidInputException ex) {
+                        errorBuilder.append(ex.getMessage()).append(" ");
                     }
-
-                    pg.setQuantity(quantity);
-                    pg.setEffort(effort);
-                    pg.setPl(plan);
-
-                    if (quantity != 0 && effort != 0) {
-                        plan.getPc().add(pg);
-                    }
-                } catch (NumberFormatException e) {
-                    // If parsing fails, append an error message
-                    errorBuilder.append("Invalid input for quantity or effort!");
-                } catch (InvalidInputException ex) {
-                    errorBuilder.append(ex.getMessage()).append(" ");
                 }
             }
             if (errorBuilder.length() > 0) {
@@ -106,9 +108,8 @@ public class ProductionPlanCreate extends BaseRBACController {
                 request.getRequestDispatcher("../view/productionplan/create.jsp").forward(request, response);
                 return;
             }
-            String error = "Your plan was added!";
             String error1 = "Your plan did not have any campains!";
-            if (plan.getPc().size() > 0) {
+            if (!plan.getPc().isEmpty()) {
                 PlanDBContext db = new PlanDBContext();
                 db.insert(plan);
                 response.sendRedirect("../productionplan/list");
