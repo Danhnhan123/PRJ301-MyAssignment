@@ -8,19 +8,49 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Attendance</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Attendance Update</title>
+        <!-- Bootstrap CSS -->
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Custom CSS -->
         <style>
-            table {
-                border-collapse: collapse;
-                width: 100%;
+            body {
+                background-color: #f8f9fa;
+                padding: 20px;
+                background-image: url("../view/image/anh2.jpg");
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
             }
-            th, td {
-                border: 1px solid black;
-                padding: 5px;
-                text-align: center;
+            .form-container {
+                background-color: #ffffff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+                max-width: 800px;
+                margin: auto;
+            }
+            .table-container {
+                margin-top: 20px;
+            }
+            .error-message {
+                color: red;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            .table thead th {
+                background-color: #007bff;
+                color: #fff;
+            }
+            .back-button {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                background-color: #007bff;
+                color: #fff;
             }
         </style>
         <script>
@@ -35,43 +65,62 @@
         </script>
     </head>
     <body>
-        <form action="update" method="POST">
-            <h2>Attendance in detail personal plan</h2>
-            ${requestScope.error}
-            <table>
-                <tr>
-                    <th>Employee ID</th>
-                    <th>Full Name</th>
-                    <th>Ordered Quantity</th>
-                    <th>Actual Quantity</th>
-                    <th>Alpha</th>
-                </tr>
+        <a href="javascript:history.back()" class="btn btn-secondary back-button">Back</a>
+        <div class="container form-container">
+            <h3 class="text-center mb-4">Attendance Update</h3>
+            <form action="update" method="POST">
+                <h2 class="text-center">Attendance in Detail Personal Plan</h2>
 
-                <tr>
-                <input type="hidden" name="wsid" value="${requestScope.attend.id}">
-                <c:forEach items="${requestScope.ws}" var="w">
-                    <c:if test="${w.id==requestScope.attend.ws.id}">
-                        <c:forEach items="${requestScope.emps}" var="emp">
-                            <c:if test="${w.e.id==emp.id}">
-                                <td>${emp.id}<input type="hidden" name="schid" value="${w.id}"></td>
-                                <td>${emp.name}</td>
+                <c:if test="${not empty requestScope.error}">
+                    <div class="alert alert-danger error-message">${requestScope.error}</div>
+                </c:if>
+
+                <div class="table-container">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>Full Name</th>
+                                <th>Ordered Quantity</th>
+                                <th>Actual Quantity</th>
+                                <th>Alpha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                        <input type="hidden" name="wsid" value="${requestScope.attend.id}">
+
+                        <c:forEach items="${requestScope.ws}" var="w">
+                            <c:if test="${w.id == requestScope.attend.ws.id}">
+                                <c:forEach items="${requestScope.emps}" var="emp">
+                                    <c:if test="${w.e.id == emp.id}">
+                                        <td>${emp.id}<input type="hidden" name="schid" value="${w.id}"></td>
+                                        <td>${emp.name}</td>
+                                    </c:if>
+                                </c:forEach>
+                                <td>${w.quantity}</td>
+                                <td>
+                                    <input type="number" name="actualQuantity" class="form-control" placeholder="Actual Quantity" value="${requestScope.attend.quantity}"
+                                           oninput="updateAlpha(this, ${w.quantity}, this.parentElement.nextElementSibling, this.nextElementSibling)">
+                                    <input type="hidden" name="alpha2" value="">
+                                </td>
+                                <td></td>
                             </c:if>
                         </c:forEach>
-                    </c:if>
-                </c:forEach>
-                <c:forEach items="${requestScope.ws}" var="w">
-                    <c:if test="${w.id==requestScope.attend.ws.id}">
-                        <td>${w.quantity}</td>
-                        <td>
-                            <input type="number" name="actualQuantity" oninput="updateAlpha(this, ${w.quantity}, this.parentElement.nextElementSibling,this.nextElementSibling)">
-                            <input type="hidden" name="alpha2" value="">
-                        </td>
-                    </c:if>
-                </c:forEach>
-                <td></td>
-                </tr>
-            </table>
-            <input type="submit" value="Submit">
-        </form>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Bootstrap JS, Popper.js, and jQuery -->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     </body>
 </html>
