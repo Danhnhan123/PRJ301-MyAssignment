@@ -47,6 +47,8 @@ public class ProductionPlanDetailUpdate extends BaseRBACController {
 
     @Override
     protected void doAuthorizedPost(HttpServletRequest request, HttpServletResponse response, User loggeduser) throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("planId"));
+
         Schedule sche = new Schedule();
 
         sche.setId(Integer.parseInt(request.getParameter("scheId")));
@@ -55,14 +57,31 @@ public class ProductionPlanDetailUpdate extends BaseRBACController {
         sche.setCam(pc);
         sche.setDate(Date.valueOf(request.getParameter("date")));
         sche.setK(request.getParameter("k"));
-        if (request.getParameter("quantity")!=null && !request.getParameter("quantity").isEmpty() && Integer.parseInt(request.getParameter("quantity"))!=0) {
-            sche.setQuantity(Integer.parseInt(request.getParameter("quantity")));
+        if (request.getParameter("quantity") != null && !request.getParameter("quantity").isEmpty() && Integer.parseInt(request.getParameter("quantity")) != 0) {
+            if (Integer.parseInt(request.getParameter("quantity")) < 0) {
+                request.setAttribute("error", "Quantity must be positive");
+                request.setAttribute("id", request.getParameter("scheId"));
+                loadFormData(request, id);
+                request.getRequestDispatcher("/view/productionplan/detailUpdate.jsp").forward(request, response);
+            } else {
+                sche.setQuantity(Integer.parseInt(request.getParameter("quantity")));
 
-            ScheduleDBContext sches = new ScheduleDBContext();
-            sches.update(sche);
+                ScheduleDBContext sches = new ScheduleDBContext();
+                sches.update(sche);
+            }
         }
 
         response.sendRedirect("../list");
     }
 
+    private void loadFormData(HttpServletRequest request, int id) {
+        PlanDBContext db = new PlanDBContext();
+        ScheduleDBContext sdb = new ScheduleDBContext();
+
+        Plan p = db.get(id);
+
+        request.setAttribute("plan", p);
+        request.setAttribute("schedules", sdb.list());
+        request.setAttribute("planCampaigns", p.getPc());
+    }
 }

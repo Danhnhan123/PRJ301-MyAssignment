@@ -45,7 +45,6 @@ public class ProductionPlanDetail extends BaseRBACController {
     protected void doAuthorizedGet(HttpServletRequest request, HttpServletResponse response, User loggeduser) throws ServletException, IOException {
         PlanDBContext db = new PlanDBContext();
         ProductDBContext dbp = new ProductDBContext();
-        ScheduleDBContext sdb = new ScheduleDBContext();
 
         Plan p = db.get(Integer.parseInt(request.getParameter("id")));
 
@@ -89,7 +88,7 @@ public class ProductionPlanDetail extends BaseRBACController {
         }
 
         ScheduleDBContext scheduleDB = new ScheduleDBContext();
-        ArrayList<Schedule> schedulesToInsert = new ArrayList<>();  // Danh sách để lưu các Schedule cần chèn
+        ArrayList<Schedule> schedulesToInsert = new ArrayList<>();
 
         // Loop through the PlanCampaign in the plan
         for (PlanCampaign campaign : plan.getPc()) {
@@ -106,7 +105,11 @@ public class ProductionPlanDetail extends BaseRBACController {
                             schedule.setDate(date);
                             schedule.setK("K" + shift);
                             schedule.setQuantity(quantity);
-                            schedulesToInsert.add(schedule);  // Thêm schedule vào danh sách
+                            schedulesToInsert.add(schedule);
+                        } else if (quantity < 0) {
+                            request.setAttribute("error", "Quantity must be positive");
+                            loadFormData(request, planId);
+                            request.getRequestDispatcher("../view/productionplan/detail.jsp").forward(request, response);
                         }
                     }
                 }
@@ -115,7 +118,7 @@ public class ProductionPlanDetail extends BaseRBACController {
 
         // Gọi phương thức insertSchedules với danh sách Schedule đã chuẩn bị
         try {
-            scheduleDB.insertSchedules(schedulesToInsert);  
+            scheduleDB.insertSchedules(schedulesToInsert);
             response.sendRedirect("../productionplan/list");
         } catch (Exception e) {
             e.printStackTrace();
@@ -123,10 +126,15 @@ public class ProductionPlanDetail extends BaseRBACController {
         }
     }
 
-}
+    private void loadFormData(HttpServletRequest request, int id) {
+        PlanDBContext db = new PlanDBContext();
+        ProductDBContext dbp = new ProductDBContext();
 
-/**
- * Returns a short description of the servlet.
- *
- * @return a String containing servlet description
- */
+        Plan p = db.get(id);
+
+        ArrayList<Date> dateList = getDateList(p.getStartTime(), p.getEndTime());
+        request.setAttribute("dateList", dateList);
+        request.setAttribute("products", dbp.list());
+        request.setAttribute("plan", p);
+    }
+}

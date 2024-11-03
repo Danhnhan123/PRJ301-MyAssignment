@@ -30,6 +30,7 @@
                 ${requestScope.plan.id}<input type="hidden" name="planId" value="${requestScope.plan.id}">
                 <input type="hidden" name="startDate" value="${requestScope.plan.startTime}">
                 <input type="hidden" name="endDate" value="${requestScope.plan.endTime}"></h2>
+                ${requestScope.error}
             <table>
                 <tr>
                     <th rowspan="3">Products</th>

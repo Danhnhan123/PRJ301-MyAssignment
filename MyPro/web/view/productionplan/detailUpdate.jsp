@@ -26,9 +26,11 @@
     </head>
     <body>
         <form action="update" method="POST">
+            <input type="hidden" name="id" value="${param.id != null ? param.id : requestScope.id}">
             <h2>Workshop: 
                 ${requestScope.plan.id}<input type="hidden" name="planId" value="${requestScope.plan.id}">
             </h2>
+            ${requestScope.error}
             <table>
                 <tr>
                     <th>Products</th>
@@ -44,8 +46,8 @@
                             <c:forEach items="${requestScope.planCampaigns}" var="pc">
                                 <c:if test="${sc.cam.id==pc.id}">
                                     <td>${pc.p.name}<input type="hidden" name="camid" value="${pc.id}"></td>
-                                </c:if>
-                            </c:forEach>
+                                    </c:if>
+                                </c:forEach>
                             <td>
                                 ${sc.date}<input type="hidden" name="date" value="${sc.date}">
                             </td>
