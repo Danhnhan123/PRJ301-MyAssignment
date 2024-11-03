@@ -115,7 +115,7 @@ public class ProductionPlanDetail extends BaseRBACController {
 
         // Gọi phương thức insertSchedules với danh sách Schedule đã chuẩn bị
         try {
-            scheduleDB.insertSchedules(schedulesToInsert);  // Chèn tất cả các schedule cùng lúc
+            scheduleDB.insertSchedules(schedulesToInsert);  
             response.sendRedirect("../productionplan/list");
         } catch (Exception e) {
             e.printStackTrace();

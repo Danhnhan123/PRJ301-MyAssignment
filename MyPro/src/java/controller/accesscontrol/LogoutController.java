@@ -29,7 +29,7 @@ public class LogoutController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.getSession().setAttribute("account", null);
-        response.sendRedirect("index.html");
+        response.sendRedirect("login.jsp");
     }
 
     @Override

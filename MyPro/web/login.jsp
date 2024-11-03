@@ -1,8 +1,11 @@
+<%-- 
+    Document   : login.jsp
+    Created on : Nov 3, 2024, 2:12:04 PM
+    Author     : Ad
+--%>
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit this template
--->
 <html>
     <head>
         <title>Login - Company</title>
@@ -108,6 +111,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
                 font-size: 16px;
                 margin-bottom: 0;
             }
+            .error-message {
+                color: red;
+                margin-bottom: 20px;
+                font-size: 14px;
+                text-align: center;
+            }
         </style>
     </head>
     <body>
@@ -126,6 +135,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
                             <td><input type="password" name="password"/></td>
                         </tr>
                     </table>
+                    <div class="error-message">${requestScope.error}</div>
                     <input type="submit" value="Sign in"/>
                 </form>
             </div>
@@ -137,4 +147,3 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         </div>
     </body>
 </html>
-
