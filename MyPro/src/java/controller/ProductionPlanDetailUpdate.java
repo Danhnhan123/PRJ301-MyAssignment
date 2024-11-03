@@ -55,10 +55,12 @@ public class ProductionPlanDetailUpdate extends BaseRBACController {
         sche.setCam(pc);
         sche.setDate(Date.valueOf(request.getParameter("date")));
         sche.setK(request.getParameter("k"));
-        sche.setQuantity(Integer.parseInt(request.getParameter("quantity")));
+        if (request.getParameter("quantity")!=null && !request.getParameter("quantity").isEmpty() && Integer.parseInt(request.getParameter("quantity"))!=0) {
+            sche.setQuantity(Integer.parseInt(request.getParameter("quantity")));
 
-        ScheduleDBContext sches = new ScheduleDBContext();
-        sches.update(sche);
+            ScheduleDBContext sches = new ScheduleDBContext();
+            sches.update(sche);
+        }
 
         response.sendRedirect("../list");
     }

@@ -68,10 +68,8 @@
                     </tr>
                 </c:forEach>
             </table>
-            <br/>
+            <br>
             <input type="submit" value="Submit Quantities">
-            <br/>
-            ${requestScope.error}
         </form>
     </body>
 </html>
