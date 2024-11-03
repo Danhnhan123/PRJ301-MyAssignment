@@ -46,13 +46,28 @@ public class WorkAttendentUpdate extends BaseRBACController {
         WokerSchedule ws = new WokerSchedule();
         ws.setId(Integer.parseInt(request.getParameter("schid")));
         at.setWs(ws);
-        at.setQuantity(Integer.parseInt(request.getParameter("actualQuantity")));
-        at.setAlpha(Float.parseFloat(request.getParameter("alpha2")));
+        if (request.getParameter("actualQuantity") != null && !request.getParameter("actualQuantity").isEmpty() && Integer.parseInt(request.getParameter("actualQuantity")) != 0) {
+            if (Integer.parseInt(request.getParameter("actualQuantity")) < 0) {
+                request.setAttribute("error", "Quantity must be positive");
+                loadFormData(request,id);
+                request.getRequestDispatcher("/view/work/attendentUpdate.jsp").forward(request, response);
+            } else {
+                at.setQuantity(Integer.parseInt(request.getParameter("actualQuantity")));
+                at.setAlpha(Float.parseFloat(request.getParameter("alpha2")));
 
-        AttendentDBContext db = new AttendentDBContext();
-        db.update(at);
-
+                AttendentDBContext db = new AttendentDBContext();
+                db.update(at);
+            }
+        }
         response.sendRedirect("../list");
     }
 
+    private void loadFormData(HttpServletRequest request, int id) {
+        AttendentDBContext ats = new AttendentDBContext();
+        EmployeeDBContext emps = new EmployeeDBContext();
+        WokerScheduleDBContext db = new WokerScheduleDBContext();
+        request.setAttribute("ws", db.list());
+        request.setAttribute("attend", ats.get(id));
+        request.setAttribute("emps", emps.list());
+    }
 }

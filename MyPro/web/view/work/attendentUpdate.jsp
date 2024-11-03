@@ -37,6 +37,7 @@
     <body>
         <form action="update" method="POST">
             <h2>Attendance in detail personal plan</h2>
+            ${requestScope.error}
             <table>
                 <tr>
                     <th>Employee ID</th>

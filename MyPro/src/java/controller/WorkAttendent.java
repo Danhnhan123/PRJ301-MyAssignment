@@ -49,17 +49,25 @@ public class WorkAttendent extends BaseRBACController {
     @Override
     protected void doAuthorizedPost(HttpServletRequest request, HttpServletResponse response, User loggeduser) throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("scid"));
+        int scheId = Integer.parseInt(request.getParameter("scheId"));
         ArrayList<Attendent> attend = new ArrayList<>();
         WokerScheduleDBContext ws = new WokerScheduleDBContext();
 
         for (WokerSchedule worker : ws.list()) {
             if (worker.getId() == id) {
                 Attendent at = new Attendent();
-                if (request.getParameter("actualQuantity") != null && !request.getParameter("actualQuantity").isEmpty()) {
-                    at.setQuantity(Integer.parseInt(request.getParameter("actualQuantity")));
-                    at.setWs(worker);
-                    at.setAlpha(Float.parseFloat(request.getParameter("alpha2")));
-                    attend.add(at);
+                if (request.getParameter("actualQuantity") != null && !request.getParameter("actualQuantity").isEmpty() && Integer.parseInt(request.getParameter("actualQuantity")) != 0) {
+                    if (Integer.parseInt(request.getParameter("actualQuantity")) < 0) {
+                        request.setAttribute("error", "Quantity must be positive");
+                        request.setAttribute("wsid", id);
+                        loadFormData(request, scheId);
+                        request.getRequestDispatcher("../view/work/attendent.jsp").forward(request, response);
+                    } else {
+                        at.setQuantity(Integer.parseInt(request.getParameter("actualQuantity")));
+                        at.setWs(worker);
+                        at.setAlpha(Float.parseFloat(request.getParameter("alpha2")));
+                        attend.add(at);
+                    }
                 }
             }
         }
@@ -69,4 +77,17 @@ public class WorkAttendent extends BaseRBACController {
         response.sendRedirect("../work/list");
     }
 
+    private void loadFormData(HttpServletRequest request, int id) {
+         WokerScheduleDBContext ws = new WokerScheduleDBContext();
+        ScheduleDBContext sches = new ScheduleDBContext();
+        EmployeeDBContext emps = new EmployeeDBContext();
+        ProductDBContext pr = new ProductDBContext();
+        PlanDBContext db = new PlanDBContext();
+
+        request.setAttribute("plans", db.list());
+        request.setAttribute("products", pr.list());
+        request.setAttribute("emps", emps.list());
+        request.setAttribute("workList", ws.list());
+        request.setAttribute("schedule", sches.get(id));
+    }
 }

@@ -35,9 +35,11 @@
     </head>
     <body>
         <form action="attendent" method="POST">
+            <input type="hidden" name="wsid" value="${param.wsid != null ? param.wsid : requestScope.wsid}">
             <h2>Attendance in detail personal plan(Schedule): ${requestScope.schedule.id}
                 <input type="hidden" name="scheId" value="${requestScope.schedule.id}">
             </h2>
+            ${requestScope.error}
             <table>
                 <tr>
                     <th>Employee ID</th>
