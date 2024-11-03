@@ -44,9 +44,17 @@
                 background-color: #007bff;
                 color: #fff;
             }
+            .back-button {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                background-color: #007bff;
+                color: #fff;
+            }
         </style>
     </head>
     <body>
+        <a href="javascript:history.back()" class="btn btn-secondary back-button">Back</a>
         <div class="container form-container">
             <h3 class="text-center mb-4">Create Production Plan</h3>
             <form action="create" method="POST">
