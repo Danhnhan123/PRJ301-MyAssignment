@@ -3,7 +3,7 @@
     Created on : Oct 26, 2024, 2:17:19 PM
     Author     : Ad
 --%>
-
+<%@ taglib uri="/WEB-INF/tlds/mytags" prefix="mytag" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -92,7 +92,7 @@
                                         </c:if>
                                     </c:forEach>
                                     <td>
-                                        ${sc.date}
+                                        <mytag:ToVietnameseDate value="${sc.date}" />
                                         <input type="hidden" name="date" value="${sc.date}">
                                     </td>
                                     <td>

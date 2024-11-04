@@ -3,7 +3,7 @@
     Created on : Oct 16, 2024, 5:36:42 PM
     Author     : Ad
 --%>
-
+<%@ taglib uri="/WEB-INF/tlds/mytags" prefix="mytag" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -74,7 +74,7 @@
 
                             <thead>
                                 <tr>
-                                    <th scope="col" colspan="4">${date}</th>
+                                    <th scope="col" colspan="4"><mytag:ToVietnameseDate value="${date}" /></th>
                                 </tr>
                                 <tr>
                                     <th scope="col">Products</th>
