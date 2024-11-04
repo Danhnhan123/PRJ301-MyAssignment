@@ -3,7 +3,7 @@
     Created on : Oct 27, 2024, 10:36:52 AM
     Author     : Ad
 --%>
-
+<%@ taglib uri="/WEB-INF/tlds/mytags" prefix="mytag" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -23,11 +23,11 @@
                 align-items: center;
                 justify-content: center;
                 min-height: 100vh;
-                background-image: url("../view/image/anh1.jpg"); 
-                background-size: cover; 
-                background-position: center; 
+                background-image: url("../view/image/anh1.jpg");
+                background-size: cover;
+                background-position: center;
                 background-repeat: no-repeat;
-                background-color: #f4f4f9; 
+                background-color: #f4f4f9;
             }
             .container {
                 max-width: 1200px;
@@ -134,8 +134,8 @@
                     <c:forEach items="${requestScope.plans}" var="pl">
                         <tr>
                             <td><a href="list?id=${pl.id}">${pl.id}</a></td>
-                            <td>${pl.startTime}</td>
-                            <td>${pl.endTime}</td>
+                            <td><mytag:ToVietnameseDate value="${pl.startTime}" /></td>
+                            <td><mytag:ToVietnameseDate value="${pl.endTime}" /></td>
                             <c:forEach items="${requestScope.depts}" var="dept">
                                 <c:if test="${pl.d.id == dept.id}">
                                     <td>${dept.name}</td>
@@ -186,7 +186,7 @@
                             <c:forEach items="${requestScope.schedules}" var="sche">
                                 <c:if test="${sche.cam.id == pcl.id}">
                                     <tr>
-                                        <td><a href="list?id=${param.id}&scheId=${sche.id}">${sche.date}</a></td>
+                                        <td><a href="list?id=${param.id}&scheId=${sche.id}"><mytag:ToVietnameseDate value="${sche.date}" /></a></td>
                                         <td>${sche.k}</td>
                                         <c:forEach items="${requestScope.products}" var="pr">
                                             <c:if test="${pcl.p.id == pr.id}">
