@@ -61,7 +61,7 @@ public class LoginController extends HttpServlet {
 
         if (account != null) {
             request.getSession().setAttribute("account", account);
-            response.sendRedirect(request.getContextPath() + "/Home.html");
+            response.sendRedirect(request.getContextPath() + "/auth/Home.html");
         } else {
             request.setAttribute("error", "Wrong password or Account not exist!");
             request.getRequestDispatcher("login.jsp").forward(request, response);
@@ -69,14 +69,6 @@ public class LoginController extends HttpServlet {
 
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+
 
 }

@@ -20,7 +20,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
                 align-items: center;
                 justify-content: center;
                 min-height: 100vh;
-                background-image: url("view/image/anh1.jpg"); /* Replace with your background image path */
+                background-image: url("../view/image/anh1.jpg"); /* Replace with your background image path */
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
@@ -89,8 +89,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         <div class="container">
             <h1>Company Dashboard</h1>
             <div class="nav-links">
-                <a href="productionplan/list">Production Plan</a>
-                <a href="work/list">Work Schedule</a>
+                <a href="../productionplan/list">Production Plan</a>
+                <a href="../work/list">Work Schedule</a>
             </div>
             <div class="avatar" onclick="toggleDropdown()"></div> <!-- Avatar for user -->
             <div class="dropdown" id="dropdownMenu">
@@ -108,7 +108,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             function confirmLogout() {
                 if (confirm("Do you really want to logout?")) {
                     // Redirect to logout servlet or another page
-                    window.location.href = 'logout'; // Ensure you have a servlet mapped to /logout
+                    window.location.href = '../logout'; // Ensure you have a servlet mapped to /logout
                 }
             }
 

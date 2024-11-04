@@ -1,0 +1,3 @@
+/login
+/login.jsp
+/auth/access/test.jsp
