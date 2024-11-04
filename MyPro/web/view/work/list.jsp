@@ -118,7 +118,7 @@
     <body>
         <div class="container">
             <h2>Production Plan</h2>
-            <h3><a href="../Home.html">HOME</a></h3>
+            <h3><a href="../auth/Home.html">HOME</a></h3>
 
             <h3>General:</h3>
             <div class="error">${requestScope.error}</div>
